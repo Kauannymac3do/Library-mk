@@ -4,466 +4,406 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#100d19">
-  <title>Library MK — Sua biblioteca digital</title>
-
+  <meta name="theme-color" content="#24113d">
+  <title>Library MK | Sua próxima leitura</title>
   <style>
     :root {
-      --bg: #100d19;
-      --panel: #1c1729;
-      --purple: #a78bfa;
-      --text: #f6f2ff;
-      --muted: #b8afca;
-      --border: #352b49;
+      --bg: #100b18;
+      --surface: #1d1529;
+      --surface2: #291d38;
+      --text: #f8f3ff;
+      --muted: #c0b3d0;
+      --accent: #bd83ff;
+      --accent2: #e5caff;
+      --border: #40304f;
+      --shadow: 0 8px 25px #0002;
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
+    body.light {
+      --bg: #faf7ff;
+      --surface: #ffffff;
+      --surface2: #f0e7fa;
+      --text: #291638;
+      --muted: #6e5b7c;
+      --accent: #7a35ba;
+      --accent2: #ead8ff;
+      --border: #e2d4ef;
+      --shadow: 0 8px 25px #39205212;
     }
+
+    * { box-sizing: border-box; }
 
     body {
+      margin: 0;
       background: var(--bg);
       color: var(--text);
-      font-family: system-ui, sans-serif;
-      min-height: 100vh;
+      font-family: Arial, sans-serif;
+      transition: background .2s, color .2s;
     }
 
-    header {
+    button, input, select { font: inherit; }
+
+    button {
+      cursor: pointer;
+      border: 0;
+      border-radius: 10px;
+      padding: 11px 15px;
+      font-weight: bold;
+    }
+
+    .topbar {
       display: flex;
       justify-content: space-between;
       align-items: center;
       gap: 12px;
-      padding: 20px 6%;
+      padding: 18px 6%;
+      background: var(--surface);
       border-bottom: 1px solid var(--border);
     }
 
-    .logo {
-      font-size: 21px;
-      font-weight: 800;
-      color: var(--purple);
-    }
-
-    .logo span {
-      color: white;
-    }
-
-    .vip-tag {
-      background: #35264f;
-      color: #d8c7ff;
-      padding: 8px 12px;
-      border-radius: 20px;
-      font-size: 12px;
-    }
-
-    main {
-      width: min(1100px, 90%);
-      margin: auto;
-    }
+    .logo { font-size: 22px; font-weight: 800; }
+    .logo span { color: var(--accent); }
+    .theme-btn { background: var(--surface2); color: var(--text); }
 
     .hero {
-      padding: 55px 0 35px;
+      padding: 54px 6% 42px;
+      background: linear-gradient(135deg, var(--surface2), var(--bg));
     }
 
-    .eyebrow {
-      color: var(--purple);
+    .tag {
+      color: var(--accent);
       font-size: 12px;
-      letter-spacing: 2px;
       font-weight: bold;
-      margin-bottom: 14px;
+      letter-spacing: 2px;
     }
 
-    h1 {
-      font-size: clamp(32px, 7vw, 55px);
-      line-height: 1.1;
-      max-width: 650px;
-      margin-bottom: 16px;
-    }
-
-    h1 span {
-      color: var(--purple);
-    }
-
-    .description {
-      color: var(--muted);
-      line-height: 1.7;
-      max-width: 540px;
-      margin-bottom: 25px;
-    }
+    h1 { font-size: clamp(30px, 5vw, 48px); margin: 14px 0; }
+    .hero p, .muted { color: var(--muted); line-height: 1.6; }
+    .hero p { max-width: 570px; }
 
     .search {
       display: flex;
       gap: 10px;
-      max-width: 600px;
+      max-width: 650px;
+      margin-top: 25px;
     }
 
-    input, select {
-      background: var(--panel);
-      border: 1px solid var(--border);
-      color: white;
-      border-radius: 12px;
-      padding: 14px;
-      font: inherit;
+    .search input {
       min-width: 0;
-    }
-
-    input {
       flex: 1;
-      width: 100%;
+      padding: 14px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
     }
 
-    input::placeholder {
-      color: #a79bbd;
-    }
+    .primary { background: var(--accent); color: white; }
+    .secondary { background: var(--surface2); color: var(--text); }
 
-    button {
-      border: 0;
-      border-radius: 12px;
-      padding: 13px 18px;
-      font: inherit;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    .primary {
-      background: var(--purple);
-      color: #160f24;
-    }
-
-    .section-title {
-      font-size: 23px;
-      margin-bottom: 8px;
-    }
-
-    .section-subtitle {
-      color: var(--muted);
-      font-size: 14px;
-      margin-bottom: 22px;
-    }
-
-    .catalog {
-      padding: 25px 0 45px;
-    }
+    main { padding: 28px 6% 55px; }
+    .section-heading { margin: 12px 0 18px; }
+    .section-heading p { color: var(--muted); }
 
     .filters {
       display: flex;
-      gap: 10px;
+      gap: 8px;
       flex-wrap: wrap;
-      margin-bottom: 24px;
+      margin-bottom: 25px;
     }
 
     .filter {
-      background: var(--panel);
+      color: var(--text);
+      background: var(--surface);
       border: 1px solid var(--border);
-      color: var(--muted);
-      padding: 9px 14px;
-      border-radius: 20px;
     }
 
     .filter.active {
-      background: var(--purple);
-      color: #160f24;
-      border-color: var(--purple);
+      background: var(--accent);
+      color: white;
+      border-color: var(--accent);
     }
 
-    .books {
+    .grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
-      gap: 16px;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 18px;
     }
 
     .book {
-      background: var(--panel);
+      background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: 16px;
-      overflow: hidden;
+      border-radius: 15px;
+      padding: 16px;
+      box-shadow: var(--shadow);
     }
 
     .cover {
-      min-height: 180px;
+      height: 155px;
+      border-radius: 10px;
       display: flex;
-      align-items: center;
       justify-content: center;
+      align-items: center;
       text-align: center;
-      padding: 20px;
-      background: linear-gradient(145deg, #39254e, #171222);
-      font-size: 42px;
-    }
-
-    .book-info {
-      padding: 14px;
-    }
-
-    .book-info h3 {
-      font-size: 15px;
-      margin-bottom: 6px;
-    }
-
-    .book-info p {
-      font-size: 12px;
-      color: var(--muted);
-      margin-bottom: 12px;
-    }
-
-    .book-info button {
-      width: 100%;
-      font-size: 12px;
-      padding: 10px 6px;
-    }
-
-    .vip-section {
-      background: linear-gradient(135deg, #2b1e40, #191425);
-      border: 1px solid #594176;
-      border-radius: 22px;
-      padding: 28px;
-      margin: 10px 0 45px;
-    }
-
-    .vip-section h2 {
-      font-size: 26px;
-      margin: 12px 0;
-    }
-
-    .price {
-      font-size: 35px;
+      padding: 15px;
+      margin-bottom: 15px;
+      font-size: 23px;
       font-weight: 800;
-      margin: 18px 0;
+      color: white;
+      background: linear-gradient(135deg, #55327a, #bd83ff);
     }
 
-    .price small {
-      font-size: 14px;
-      color: var(--muted);
-      font-weight: normal;
+    .cover.pink { background: linear-gradient(135deg, #742d65, #e78ebc); }
+    .cover.blue { background: linear-gradient(135deg, #203e68, #6e9fe8); }
+    .cover.green { background: linear-gradient(135deg, #205b4b, #79c8a5); }
+
+    .category {
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: bold;
+      text-transform: uppercase;
     }
 
-    .vip-section p {
-      color: var(--muted);
-      line-height: 1.7;
-      margin-bottom: 18px;
+    .book h3 { margin: 9px 0; }
+    .book p { color: var(--muted); font-size: 14px; line-height: 1.5; }
+    .book button { width: 100%; margin-top: 7px; }
+
+    .vip {
+      margin-top: 45px;
+      padding: 27px;
+      border-radius: 16px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
     }
 
+    .price { font-size: 30px; font-weight: 800; color: var(--accent); }
     .notice {
-      color: var(--muted);
-      font-size: 12px;
+      display: none;
+      margin-top: 18px;
+      padding: 15px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
       line-height: 1.6;
-      margin: 15px 0 30px;
     }
 
-    footer {
-      text-align: center;
-      padding: 25px;
-      border-top: 1px solid var(--border);
-      color: var(--muted);
-      font-size: 12px;
-    }
-
-    [hidden] {
-      display: none !important;
-    }
+    .notice.show { display: block; }
+    .format-options { display: flex; gap: 10px; flex-wrap: wrap; }
+    footer { padding: 25px 6%; text-align: center; color: var(--muted); border-top: 1px solid var(--border); }
 
     @media (max-width: 480px) {
-      header {
-        padding: 17px 5%;
-      }
-
-      .search {
-        flex-direction: column;
-      }
-
-      .cover {
-        min-height: 150px;
-      }
-
-      .vip-section {
-        padding: 22px;
-      }
+      .topbar { padding: 15px 5%; }
+      .hero { padding: 35px 5%; }
+      main { padding: 24px 5% 40px; }
+      .search { flex-direction: column; }
+      .grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+      .book { padding: 10px; }
+      .cover { height: 130px; font-size: 19px; }
+      .book h3 { font-size: 15px; }
+      .book p { font-size: 12px; }
+      .book button { padding: 10px 6px; font-size: 12px; }
     }
   </style>
 </head>
-
 <body>
-  <header>
-    <div class="logo">LIBRARY <span>MK.</span></div>
-    <div class="vip-tag">♛ ÁREA VIP</div>
+  <header class="topbar">
+    <div class="logo">Library <span>MK</span> 📚</div>
+    <button class="theme-btn" id="themeButton">☀️ Modo claro</button>
   </header>
 
+  <section class="hero">
+    <div class="tag">SEU PRÓXIMO UNIVERSO COMEÇA AQUI</div>
+    <h1>Uma biblioteca inteira<br>para sua imaginação.</h1>
+    <p>Descubra histórias, encontre sua próxima leitura e explore novos universos no seu ritmo.</p>
+    <div class="search">
+      <input id="searchInput" type="search" placeholder="Buscar por título ou categoria..." aria-label="Buscar livros">
+      <button class="primary" id="searchButton">Buscar</button>
+    </div>
+  </section>
+
   <main>
-    <section class="hero">
-      <p class="eyebrow">SUA PRÓXIMA HISTÓRIA COMEÇA AQUI</p>
-
-      <h1>Um universo de livros, <span>ao seu alcance.</span></h1>
-
-      <p class="description">
-        Descubra novas histórias, explore diferentes gêneros
-        e encontre sua próxima leitura na Library MK.
-      </p>
-
-      <div class="search">
-        <input
-          id="search"
-          type="search"
-          placeholder="Pesquisar livros..."
-          aria-label="Pesquisar livros"
-        >
-        <button class="primary" id="searchBtn">Pesquisar</button>
-      </div>
+    <section class="section-heading">
+      <h2>Explore a biblioteca</h2>
+      <p>Encontre uma história que combine com você.</p>
     </section>
 
-    <section class="catalog">
-      <h2 class="section-title">Explore a biblioteca</h2>
-      <p class="section-subtitle">
-        Descubra títulos disponíveis para leitura.
-      </p>
+    <nav class="filters" aria-label="Categorias de livros">
+      <button class="filter active" data-category="Todos">Todos</button>
+      <button class="filter" data-category="Romance">Romance</button>
+      <button class="filter" data-category="Fantasia">Fantasia</button>
+      <button class="filter" data-category="Suspense">Suspense</button>
+      <button class="filter" data-category="VIP">VIP</button>
+    </nav>
 
-      <div class="filters" id="filters">
-        <button class="filter active" data-category="todos">Todos</button>
-        <button class="filter" data-category="romance">Romance</button>
-        <button class="filter" data-category="fantasia">Fantasia</button>
-        <button class="filter" data-category="suspense">Suspense</button>
-        <button class="filter" data-category="vip">VIP ♛</button>
-      </div>
+    <section class="grid" id="bookGrid">
+      <article class="book" data-title="Entre páginas" data-category="Romance" data-formats="PDF,EPUB" data-vip="false">
+        <div class="cover pink">Entre páginas</div>
+        <span class="category">Romance</span>
+        <h3>Entre Páginas</h3>
+        <p>Uma história de encontros, descobertas e sentimentos.</p>
+        <button class="primary readButton">Conhecer livro</button>
+      </article>
 
-      <div class="books" id="books">
-        <article class="book" data-category="romance">
-          <div class="cover">♡</div>
-          <div class="book-info">
-            <h3>Romance de exemplo</h3>
-            <p>Romance · Gratuito</p>
-            <button class="primary read-btn">Conhecer livro</button>
-          </div>
-        </article>
+      <article class="book" data-title="Reino das sombras" data-category="Fantasia" data-formats="EPUB" data-vip="false">
+        <div class="cover">Reino das sombras</div>
+        <span class="category">Fantasia</span>
+        <h3>Reino das Sombras</h3>
+        <p>Um mundo misterioso cheio de segredos e magia.</p>
+        <button class="primary readButton">Conhecer livro</button>
+      </article>
 
-        <article class="book" data-category="fantasia">
-          <div class="cover">✧</div>
-          <div class="book-info">
-            <h3>Mundo encantado</h3>
-            <p>Fantasia · Gratuito</p>
-            <button class="primary read-btn">Conhecer livro</button>
-          </div>
-        </article>
+      <article class="book" data-title="Última pista" data-category="Suspense" data-formats="PDF" data-vip="false">
+        <div class="cover blue">Última pista</div>
+        <span class="category">Suspense</span>
+        <h3>A Última Pista</h3>
+        <p>Uma investigação em que cada detalhe importa.</p>
+        <button class="primary readButton">Conhecer livro</button>
+      </article>
 
-        <article class="book" data-category="suspense">
-          <div class="cover">☾</div>
-          <div class="book-info">
-            <h3>Segredos da noite</h3>
-            <p>Suspense · Gratuito</p>
-            <button class="primary read-btn">Conhecer livro</button>
-          </div>
-        </article>
-
-        <article class="book" data-category="vip">
-          <div class="cover">♛</div>
-          <div class="book-info">
-            <h3>Seleção especial</h3>
-            <p>Exemplo · VIP</p>
-            <button class="primary vip-btn">Conhecer o VIP</button>
-          </div>
-        </article>
-      </div>
-
-      <p id="empty" hidden>
-        Nenhum livro encontrado nessa pesquisa.
-      </p>
+      <article class="book" data-title="Universo secreto" data-category="VIP" data-formats="PDF,EPUB" data-vip="true">
+        <div class="cover green">Universo secreto</div>
+        <span class="category">VIP · Exemplo</span>
+        <h3>Universo Secreto</h3>
+        <p>Uma obra de demonstração para a futura coleção VIP.</p>
+        <button class="primary readButton">Conhecer livro</button>
+      </article>
     </section>
 
-    <section class="vip-section" id="vip">
-      <div class="eyebrow">✦ EXPERIÊNCIA EXCLUSIVA</div>
-      <h2>Library MK VIP</h2>
-      <p>
-        Uma seleção especial de leituras para quem quer
-        explorar ainda mais histórias.
-      </p>
+    <p id="emptyMessage" class="muted" hidden>Nenhum livro encontrado. Tente outra busca.</p>
 
-      <div class="price">R$ 1,99 <small>/ mês</small></div>
-
-      <p>
-        A assinatura e o acesso aos títulos VIP serão
-        disponibilizados após a configuração do pagamento.
-      </p>
-
-      <button class="primary" id="vipInfo">
-        Quero conhecer o VIP
-      </button>
+    <section class="vip">
+      <span class="tag">CLUBE VIP</span>
+      <h2>Mais histórias para descobrir 💜</h2>
+      <p class="muted">A proposta da Library MK é oferecer uma seleção VIP por assinatura.</p>
+      <div class="price">R$ 1,99 <span style="font-size:15px">/ mês</span></div>
+      <p class="muted">A assinatura ainda não está ativa. Nenhuma cobrança será feita por esta página.</p>
+      <button class="primary" id="vipButton">Conhecer o VIP</button>
     </section>
 
-    <p class="notice">
-      Os livros exibidos são exemplos demonstrativos.
-      O catálogo real será adicionado posteriormente.
-      Somente obras de sua autoria, em domínio público
-      ou com autorização de distribuição serão disponibilizadas.
-    </p>
+    <section class="notice" id="notice" aria-live="polite"></section>
   </main>
 
-  <footer>
-    © 2026 Library MK · Sua próxima leitura te espera.
-  </footer>
+  <footer>Library MK © 2026 · Um universo de histórias.</footer>
 
   <script>
-    const search = document.getElementById("search");
+    const body = document.body;
+    const themeButton = document.getElementById("themeButton");
+    const searchInput = document.getElementById("searchInput");
+    const searchButton = document.getElementById("searchButton");
     const cards = [...document.querySelectorAll(".book")];
     const filters = [...document.querySelectorAll(".filter")];
-    const empty = document.getElementById("empty");
+    const notice = document.getElementById("notice");
+    const emptyMessage = document.getElementById("emptyMessage");
 
-    let category = "todos";
+    let selectedCategory = "Todos";
 
-    function updateCatalog() {
-      const term = search.value.trim().toLowerCase();
+    // Recupera o tema escolhido anteriormente.
+    try {
+      if (localStorage.getItem("libraryMKTheme") === "light") {
+        body.classList.add("light");
+      }
+    } catch (error) {}
+
+    function updateThemeButton() {
+      const light = body.classList.contains("light");
+      themeButton.textContent = light ? "🌙 Modo escuro" : "☀️ Modo claro";
+      document.querySelector('meta[name="theme-color"]').content =
+        light ? "#faf7ff" : "#24113d";
+    }
+
+    updateThemeButton();
+
+    themeButton.addEventListener("click", () => {
+      body.classList.toggle("light");
+      try {
+        localStorage.setItem(
+          "libraryMKTheme",
+          body.classList.contains("light") ? "light" : "dark"
+        );
+      } catch (error) {}
+      updateThemeButton();
+    });
+
+    function filterBooks() {
+      const query = searchInput.value.trim().toLocaleLowerCase("pt-BR");
       let visible = 0;
 
       cards.forEach(card => {
-        const text = card.innerText.toLowerCase();
-        const matchesText = text.includes(term);
+        const title = card.dataset.title.toLocaleLowerCase("pt-BR");
+        const category = card.dataset.category.toLocaleLowerCase("pt-BR");
+        const matchesSearch = title.includes(query) || category.includes(query);
         const matchesCategory =
-          category === "todos" ||
-          card.dataset.category === category;
+          selectedCategory === "Todos" ||
+          card.dataset.category === selectedCategory;
 
-        card.hidden = !(matchesText && matchesCategory);
-
+        card.hidden = !(matchesSearch && matchesCategory);
         if (!card.hidden) visible++;
       });
 
-      empty.hidden = visible !== 0;
+      emptyMessage.hidden = visible !== 0;
+      notice.classList.remove("show");
     }
-
-    search.addEventListener("input", updateCatalog);
-
-    document.getElementById("searchBtn")
-      .addEventListener("click", updateCatalog);
 
     filters.forEach(button => {
       button.addEventListener("click", () => {
-        category = button.dataset.category;
-
-        filters.forEach(item =>
-          item.classList.toggle("active", item === button)
-        );
-
-        updateCatalog();
+        selectedCategory = button.dataset.category;
+        filters.forEach(item => item.classList.toggle("active", item === button));
+        filterBooks();
       });
     });
 
-    document.querySelectorAll(".read-btn").forEach(button => {
-      button.addEventListener("click", () => {
-        alert(
-          "Este é um livro demonstrativo. " +
-          "O leitor online será conectado em uma próxima etapa."
-        );
-      });
+    searchButton.addEventListener("click", filterBooks);
+    searchInput.addEventListener("input", filterBooks);
+    searchInput.addEventListener("keydown", event => {
+      if (event.key === "Enter") filterBooks();
     });
 
-    function showVipInfo() {
-      alert(
-        "Library MK VIP: R$ 1,99 por mês. " +
-        "A assinatura ainda será configurada."
-      );
+    function showNotice(message) {
+      notice.textContent = message;
+      notice.classList.add("show");
+      notice.scrollIntoView({ behavior: "smooth", block: "nearest" });
     }
 
-    document.getElementById("vipInfo")
-      .addEventListener("click", showVipInfo);
+    cards.forEach(card => {
+      card.querySelector(".readButton").addEventListener("click", () => {
+        const formats = card.dataset.formats.split(",");
+        notice.innerHTML = "";
 
-    document.querySelectorAll(".vip-btn").forEach(button => {
-      button.addEventListener("click", showVipInfo);
+        const title = document.createElement("h3");
+        title.textContent = card.dataset.title;
+        notice.appendChild(title);
+
+        const description = document.createElement("p");
+        description.textContent = "Escolha o formato disponível:";
+        notice.appendChild(description);
+
+        const options = document.createElement("div");
+        options.className = "format-options";
+
+        formats.forEach(format => {
+          const button = document.createElement("button");
+          button.className = "primary";
+          button.textContent = "Ler em " + format;
+          button.addEventListener("click", () => {
+            showNotice(
+              "O formato " + format + " foi selecionado para \"" +
+              card.dataset.title +
+              "\". O leitor será conectado ao arquivo autorizado na próxima etapa."
+            );
+          });
+          options.appendChild(button);
+        });
+
+        notice.appendChild(options);
+        notice.classList.add("show");
+        notice.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      });
+    });
+
+    document.getElementById("vipButton").addEventListener("click", () => {
+      showNotice(
+        "O clube VIP ainda está em preparação. A assinatura e o acesso aos livros serão configurados antes do lançamento."
+      );
     });
   </script>
 </body>
