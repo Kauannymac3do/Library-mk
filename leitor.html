@@ -1,0 +1,323 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Leitor | Library MK</title>
+
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #100b18;
+      --panel: #1d1529;
+      --text: #f8f3ff;
+      --muted: #c0b3d0;
+      --accent: #bd83ff;
+      --border: #40304f;
+    }
+
+    body.light {
+      color-scheme: light;
+      --bg: #faf7ff;
+      --panel: #ffffff;
+      --text: #291638;
+      --muted: #6e5b7c;
+      --accent: #7a35ba;
+      --border: #e2d4ef;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Georgia, serif;
+      transition: background .2s, color .2s;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 16px;
+      background: var(--panel);
+      border-bottom: 1px solid var(--border);
+      font-family: Arial, sans-serif;
+    }
+
+    .logo { font-weight: bold; font-size: 19px; }
+    .logo span { color: var(--accent); }
+
+    button, .file-label {
+      border: 0;
+      border-radius: 9px;
+      padding: 11px 14px;
+      background: var(--accent);
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      font-family: Arial, sans-serif;
+    }
+
+    .theme {
+      background: var(--bg);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    main {
+      width: min(760px, 100%);
+      margin: 0 auto;
+      padding: 22px 18px 50px;
+    }
+
+    .controls {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+      padding: 16px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      font-family: Arial, sans-serif;
+    }
+
+    input[type="file"] { display: none; }
+
+    #status {
+      color: var(--muted);
+      font: 14px/1.5 Arial, sans-serif;
+      margin: 16px 0;
+    }
+
+    #bookTitle { margin-top: 28px; line-height: 1.3; }
+
+    #bookText {
+      font-size: 19px;
+      line-height: 1.9;
+      overflow-wrap: anywhere;
+    }
+
+    #bookText p { margin: 0 0 1.3em; }
+
+    .empty {
+      margin-top: 28px;
+      padding: 28px 20px;
+      border: 1px dashed var(--border);
+      border-radius: 14px;
+      text-align: center;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    footer {
+      text-align: center;
+      color: var(--muted);
+      font: 13px Arial, sans-serif;
+      padding: 20px;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="logo">Library <span>MK</span> 📚</div>
+    <button class="theme" id="themeButton">☀️ Modo claro</button>
+  </header>
+
+  <main>
+    <h1>Seu espaço de leitura</h1>
+    <p>Abra um arquivo EPUB salvo no seu aparelho para começar.</p>
+
+    <section class="controls">
+      <label class="file-label" for="epubFile">📂 Abrir EPUB</label>
+      <input id="epubFile" type="file" accept=".epub,application/epub+zip">
+      <button class="theme" id="clearButton">Fechar livro</button>
+    </section>
+
+    <p id="status" aria-live="polite">
+      Nenhum livro aberto.
+    </p>
+
+    <h2 id="bookTitle"></h2>
+
+    <article id="bookText">
+      <div class="empty">
+        <div style="font-size:40px">📖</div>
+        <h3>Boas-vindas à Library MK</h3>
+        <p>Seu próximo capítulo começa aqui.</p>
+        <p>Toque em “Abrir EPUB” para selecionar um livro do seu aparelho.</p>
+      </div>
+    </article>
+  </main>
+
+  <footer>Library MK · Leitor experimental</footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+
+  <script>
+    const fileInput = document.getElementById("epubFile");
+    const bookTitle = document.getElementById("bookTitle");
+    const bookText = document.getElementById("bookText");
+    const status = document.getElementById("status");
+    const themeButton = document.getElementById("themeButton");
+
+    try {
+      if (localStorage.getItem("libraryMKReaderTheme") === "light") {
+        document.body.classList.add("light");
+      }
+    } catch (error) {}
+
+    function updateTheme() {
+      themeButton.textContent =
+        document.body.classList.contains("light")
+          ? "🌙 Modo escuro"
+          : "☀️ Modo claro";
+    }
+
+    updateTheme();
+
+    themeButton.addEventListener("click", () => {
+      document.body.classList.toggle("light");
+      try {
+        localStorage.setItem(
+          "libraryMKReaderTheme",
+          document.body.classList.contains("light") ? "light" : "dark"
+        );
+      } catch (error) {}
+      updateTheme();
+    });
+
+    function safeXml(xmlText) {
+      return new DOMParser().parseFromString(xmlText, "application/xml");
+    }
+
+    function getText(node) {
+      return node ? node.textContent.trim() : "";
+    }
+
+    function cleanContent(html) {
+      const parsed = new DOMParser().parseFromString(html, "text/html");
+      parsed.querySelectorAll(
+        "script, style, iframe, object, embed, form, input, video, audio"
+      ).forEach(node => node.remove());
+
+      parsed.querySelectorAll("*").forEach(node => {
+        [...node.attributes].forEach(attr => {
+          if (/^on/i.test(attr.name)) node.removeAttribute(attr.name);
+          if (
+            ["href", "src", "xlink:href"].includes(attr.name.toLowerCase()) &&
+            /^\s*javascript:/i.test(attr.value)
+          ) {
+            node.removeAttribute(attr.name);
+          }
+        });
+      });
+
+      return parsed.body.innerHTML;
+    }
+
+    fileInput.addEventListener("change", async () => {
+      const file = fileInput.files[0];
+      if (!file) return;
+
+      if (!window.JSZip) {
+        status.textContent =
+          "Não foi possível carregar a biblioteca de leitura. Verifique a conexão.";
+        return;
+      }
+
+      status.textContent = "Abrindo livro...";
+      bookTitle.textContent = "";
+      bookText.replaceChildren();
+
+      try {
+        const zip = await JSZip.loadAsync(file);
+        const containerFile = zip.file("META-INF/container.xml");
+
+        if (!containerFile) throw new Error("Arquivo EPUB inválido.");
+
+        const container = safeXml(await containerFile.async("text"));
+        const rootfile = container.querySelector("rootfile");
+
+        if (!rootfile) throw new Error("Não foi encontrado o conteúdo do livro.");
+
+        const opfPath = rootfile.getAttribute("full-path");
+        const opfFile = zip.file(opfPath);
+
+        if (!opfFile) throw new Error("Arquivo de conteúdo não encontrado.");
+
+        const opf = safeXml(await opfFile.async("text"));
+        const metadata = opf.querySelector("metadata");
+        const title = getText(metadata?.getElementsByTagNameNS("*", "title")[0]);
+
+        bookTitle.textContent = title || file.name.replace(/\.epub$/i, "");
+
+        const manifest = new Map();
+        opf.querySelectorAll("manifest item").forEach(item => {
+          manifest.set(item.id, item.getAttribute("href"));
+        });
+
+        const spine = [...opf.querySelectorAll("spine itemref")];
+        const base = opfPath.includes("/")
+          ? opfPath.slice(0, opfPath.lastIndexOf("/") + 1)
+          : "";
+
+        let count = 0;
+
+        for (const ref of spine) {
+          const href = manifest.get(ref.getAttribute("idref"));
+          if (!href) continue;
+
+          const path = (base + decodeURIComponent(href.split("#")[0]))
+            .split("/")
+            .reduce((parts, part) => {
+              if (part === "..") parts.pop();
+              else if (part && part !== ".") parts.push(part);
+              return parts;
+            }, [])
+            .join("/");
+
+          const chapter = zip.file(path);
+          if (!chapter) continue;
+
+          const html = await chapter.async("text");
+          const parsed = new DOMParser().parseFromString(html, "text/html");
+          const content = document.createElement("section");
+          content.innerHTML = cleanContent(parsed.body.innerHTML);
+
+          if (content.textContent.trim()) {
+            bookText.appendChild(content);
+            count++;
+          }
+        }
+
+        if (!count) throw new Error("Não foi possível encontrar o texto do livro.");
+
+        status.textContent = "Livro aberto · " + count + " seções carregadas.";
+      } catch (error) {
+        bookTitle.textContent = "";
+        bookText.replaceChildren();
+        status.textContent =
+          "Não consegui abrir este EPUB. Confira se o arquivo está válido e tente novamente.";
+      }
+    });
+
+    document.getElementById("clearButton").addEventListener("click", () => {
+      fileInput.value = "";
+      bookTitle.textContent = "";
+      bookText.replaceChildren();
+
+      const empty = document.createElement("div");
+      empty.className = "empty";
+      empty.textContent = "Livro fechado. Selecione outro EPUB para continuar.";
+      bookText.appendChild(empty);
+      status.textContent = "Nenhum livro aberto.";
+    });
+  </script>
+</body>
+</html>
